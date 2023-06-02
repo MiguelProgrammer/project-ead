@@ -8,8 +8,8 @@ import java.util.UUID;
 
 public interface UserService {
     List<UserModel> findAll();
-
     Optional<UserModel> findUserById(UUID userId);
     void deleteUser(UUID userId);
+    Boolean save(UserModel userModel);
 }
 

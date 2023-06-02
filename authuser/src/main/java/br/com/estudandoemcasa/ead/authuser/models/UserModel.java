@@ -10,6 +10,7 @@ import lombok.Data;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
 
 @Data
@@ -19,6 +20,27 @@ import java.util.UUID;
 public class UserModel implements Serializable {
     private static final long serialVersionID = 1L;
 
+    public UserModel() {
+        this.userStatus = UserStatus.ACTIVE;
+        this.userType = UserType.STUDENT;
+        this.creationDate = LocalDateTime.now(ZoneId.of("UTC"));
+        this.lastUpdateDate = LocalDateTime.now(ZoneId.of("UTC"));
+    }
+
+    public UserModel(UUID userID, String userName, String email, String password, String fullName, UserStatus userStatus, UserType userType, String phoneNumber, String cpf, String imageUrl, LocalDateTime creationDate, LocalDateTime lastUpdateDate) {
+        this.userID = userID;
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
+        this.fullName = fullName;
+        this.userStatus = UserStatus.ACTIVE;
+        this.userType = UserType.STUDENT;
+        this.phoneNumber = phoneNumber;
+        this.cpf = cpf;
+        this.imageUrl = imageUrl;
+        this.creationDate = LocalDateTime.now(ZoneId.of("UTC"));
+        this.lastUpdateDate = LocalDateTime.now(ZoneId.of("UTC"));
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
