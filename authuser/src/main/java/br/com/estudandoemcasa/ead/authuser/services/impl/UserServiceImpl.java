@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
     public Boolean save(UserModel userModel) {
         if(Boolean.FALSE.equals(userRepository.existsByEmail(userModel.getEmail())) ||
                 Boolean.FALSE.equals(userRepository.existsByUserName(userModel.getUserName()))){
-            userRepository.save(userModel);
+            userRepository.saveAndFlush(userModel);
             return true;
         }
         return false;

@@ -1,10 +1,12 @@
 package br.com.estudandoemcasa.ead.authuser.controllers;
 
 import br.com.estudandoemcasa.ead.authuser.dto.UserDto;
+import br.com.estudandoemcasa.ead.authuser.dto.userutils.UserView;
 import br.com.estudandoemcasa.ead.authuser.enums.UserStatus;
 import br.com.estudandoemcasa.ead.authuser.enums.UserType;
 import br.com.estudandoemcasa.ead.authuser.models.UserModel;
 import br.com.estudandoemcasa.ead.authuser.services.UserService;
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +24,7 @@ public class AuthenticatorController {
     private UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<Object> registeruSer(@RequestBody UserDto userDto){
+    public ResponseEntity<Object> registeruSer(@RequestBody @JsonView(UserView.RegistrationPost.class) UserDto userDto){
         var userModel = new UserModel();
         BeanUtils.copyProperties(userDto, userModel);
         if(userService.save(userModel)) {
