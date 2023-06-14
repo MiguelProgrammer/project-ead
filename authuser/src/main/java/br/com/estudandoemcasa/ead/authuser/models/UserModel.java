@@ -27,21 +27,6 @@ public class UserModel implements Serializable {
         this.lastUpdateDate = LocalDateTime.now(ZoneId.of("UTC"));
     }
 
-    public UserModel(UUID userID, String userName, String email, String password, String fullName, UserStatus userStatus, UserType userType, String phoneNumber, String cpf, String imageUrl, LocalDateTime creationDate, LocalDateTime lastUpdateDate) {
-        this.userID = userID;
-        this.userName = userName;
-        this.email = email;
-        this.password = password;
-        this.fullName = fullName;
-        this.userStatus = UserStatus.ACTIVE;
-        this.userType = UserType.STUDENT;
-        this.phoneNumber = phoneNumber;
-        this.cpf = cpf;
-        this.imageUrl = imageUrl;
-        this.creationDate = LocalDateTime.now(ZoneId.of("UTC"));
-        this.lastUpdateDate = LocalDateTime.now(ZoneId.of("UTC"));
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID userID;
@@ -52,7 +37,7 @@ public class UserModel implements Serializable {
     @Column(nullable = false, unique = true, length = 50)
     private String email;
 
-    @JsonIgnore
+    //@JsonIgnore
     @Column(nullable = false, length = 255)
     private String password;
 

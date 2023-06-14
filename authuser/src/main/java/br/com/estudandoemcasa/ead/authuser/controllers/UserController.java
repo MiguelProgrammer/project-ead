@@ -6,10 +6,12 @@ import br.com.estudandoemcasa.ead.authuser.models.UserModel;
 import br.com.estudandoemcasa.ead.authuser.services.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,12 +26,9 @@ import static br.com.estudandoemcasa.ead.authuser.constants.Constants.*;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/users")
 public class UserController {
-
     @Autowired
     private UserService userService;
-
-    private UserModel userModel = new UserModel();
-
+    private HttpStatus httpStatus = HttpStatus.NOT_FOUND;
     @GetMapping
     public ResponseEntity<List<UserModel>> getAllUsers(){
         return ResponseEntity.status(HttpStatus.OK).body(userService.findAll());
@@ -39,31 +38,33 @@ public class UserController {
     public ResponseEntity<Object> getOneUser(@PathVariable("userId") UUID userId){
         Optional<UserModel> userModelOptional = userService.findUserById(userId);
         return userModelOptional.isEmpty()?
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body(USER_NOT_FOUND)
+                ResponseEntity.status(httpStatus).body(USER_NOT_FOUND)
                 : ResponseEntity.status(HttpStatus.OK).body(userModelOptional.get());
     }
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Object>  deleteUser(@PathVariable("userId") UUID userId){
         if(Objects.isNull(getOneUser(userId))) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(USER_NOT_FOUND);
+            return ResponseEntity.status(httpStatus).body(USER_NOT_FOUND);
         } else{
+            httpStatus = HttpStatus.OK;
             userService.deleteUser(userId);
-            return ResponseEntity.status(HttpStatus.OK).body(USER_UPDATE);
+            return ResponseEntity.status(httpStatus).body(USER_UPDATE);
         }
     }
+
     @Transactional
     @PutMapping("/{userId}")
     public ResponseEntity<Object> updateUser(@PathVariable("userId") UUID userId,
-                                             @RequestBody @JsonView(UserView.UserPut.class) UserDto userDto){
+                                             @RequestBody @Validated(UserView.UserPut.class)
+                                             @JsonView(UserView.UserPut.class) UserDto userDto) {
 
         log.info("Method: UPDATE USER\n");
 
         Optional<UserModel> userModelOptional = userService.findUserById(userId);
-        HttpStatus httpStatus = HttpStatus.NOT_FOUND;
         StringBuilder message = new StringBuilder(USER_OR_PASSWORD_INCORRECT);
 
-        if(userModelOptional.isPresent()){
+        if(userModelOptional.isPresent() && this.haveAccess(userDto, userModelOptional)){
             userModelOptional.get().setFullName(userDto.getFullName());
             userModelOptional.get().setPhoneNumber(userDto.getPhoneNumber());
             userModelOptional.get().setCpf(userDto.getCpf());
@@ -80,21 +81,23 @@ public class UserController {
     @Transactional
     @PutMapping("/{userId}/password")
     public ResponseEntity<Object> updatePassword(@PathVariable("userId") UUID userId,
-                                                 @RequestBody @JsonView(UserView.PasswordPut.class) UserDto userDto){
+                                                 @RequestBody
+                                                 @Validated({UserView.PasswordPut.class,UserView.RegistrationPost.class})
+                                                 @JsonView(UserView.PasswordPut.class) UserDto userDto){
 
         log.info("Method: UPDATE PASSWORD\n");
 
         Optional<UserModel> userModelOptional = userService.findUserById(userId);
-        HttpStatus httpStatus = HttpStatus.NOT_FOUND;
         StringBuilder message = new StringBuilder(USER_OR_PASSWORD_INCORRECT);
 
-        if(userModelOptional.isPresent() && haveAccess(userDto, userModelOptional)){
+        if(userModelOptional.isPresent() && userDto.getOldPassword().equals(userModelOptional.get().getPassword())){
             userModelOptional.get().setPassword(userDto.getPassword());
             userModelOptional.get().setLastUpdateDate(LOCAL_DATE_TIME_NOW);
 
             httpStatus = HttpStatus.OK;
             message.delete(0, message.length());
             message.insert(0, PASSWORD_UPDATE);
+            userService.update(userModelOptional.get());
         }
 
         return ResponseEntity.status(httpStatus).body(message);
@@ -103,12 +106,13 @@ public class UserController {
     @Transactional
     @PutMapping("/{userId}/image")
     public ResponseEntity<Object> updateImg(@PathVariable("userId") UUID userId,
-                                            @RequestBody @JsonView(UserView.ImagePut.class) UserDto userDto){
+                                            @RequestBody
+                                            @Validated(UserView.ImagePut.class)
+                                            @JsonView(UserView.ImagePut.class) UserDto userDto){
 
         log.info("Method: UPDATE IMG\n");
 
         Optional<UserModel> userModelOptional = userService.findUserById(userId);
-        HttpStatus httpStatus = HttpStatus.NOT_FOUND;
         StringBuilder message = new StringBuilder(USER_OR_PASSWORD_INCORRECT);
 
         if(userModelOptional.isPresent()){
@@ -123,7 +127,7 @@ public class UserController {
         return ResponseEntity.status(httpStatus).body(message);
     }
 
-    private boolean haveAccess(UserDto userDto, Optional<UserModel> userModelOptional) {
+    private Boolean haveAccess(UserDto userDto, Optional<UserModel> userModelOptional) {
         return userModelOptional.get().getPassword().equals(userDto.getPassword());
     }
 }

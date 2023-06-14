@@ -6,6 +6,8 @@ import br.com.estudandoemcasa.ead.authuser.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,18 +29,36 @@ public class UserServiceImpl implements UserService {
     public Optional<UserModel> findUserById(UUID userId) {
         return userRepository.findById(userId);
     }
+
     @Override
     public void deleteUser(UUID userId) {
         userRepository.deleteById(userRepository.findById(userId).get().getUserID());
     }
+
     @Override
     public Boolean save(UserModel userModel) {
-        if(Boolean.FALSE.equals(userRepository.existsByEmail(userModel.getEmail())) ||
-                Boolean.FALSE.equals(userRepository.existsByUserName(userModel.getUserName()))){
+        if (Boolean.FALSE.equals(userRepository.existsByEmail(userModel.getEmail())) ||
+                Boolean.FALSE.equals(userRepository.existsByUserName(userModel.getUserName()))) {
             userRepository.saveAndFlush(userModel);
             return true;
         }
         return false;
+    }
+
+    @Transactional
+    @Override
+    public UserModel update(UserModel userModel) {
+        return userRepository.saveAndFlush(userModel);
+    }
+
+    @Override
+    public Boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    @Override
+    public Boolean existsByUserName(String userName) {
+        return userRepository.existsByUserName(userName);
     }
 
 }
