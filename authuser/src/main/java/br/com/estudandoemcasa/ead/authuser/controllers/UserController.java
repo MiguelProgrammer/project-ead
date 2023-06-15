@@ -6,7 +6,6 @@ import br.com.estudandoemcasa.ead.authuser.models.UserModel;
 import br.com.estudandoemcasa.ead.authuser.services.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -134,6 +132,6 @@ public class UserController {
     }
 
     private Boolean haveAccess(UserDto userDto, Optional<UserModel> userModelOptional) {
-        return userModelOptional.get().getPassword().equals(userDto.getPassword());
+        return userModelOptional.orElseThrow().getPassword().equals(userDto.getPassword());
     }
 }

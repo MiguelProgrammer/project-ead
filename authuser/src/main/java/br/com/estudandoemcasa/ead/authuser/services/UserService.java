@@ -12,8 +12,8 @@ public interface UserService {
     List<UserModel> findAll();
     Optional<UserModel> findUserById(UUID userId);
     void deleteUser(UUID userId);
-    Boolean save(UserModel userModel);
-    UserModel update(UserModel userModel);
+    void save(UserModel userModel);
+    void update(UserModel userModel);
     Boolean existsByEmail(String email);
     Boolean existsByUserName(String userName);
     Page<UserModel> findAll(Pageable pageable);
