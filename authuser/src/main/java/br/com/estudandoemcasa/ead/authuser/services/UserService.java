@@ -1,7 +1,8 @@
 package br.com.estudandoemcasa.ead.authuser.services;
 
 import br.com.estudandoemcasa.ead.authuser.models.UserModel;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,5 +16,6 @@ public interface UserService {
     UserModel update(UserModel userModel);
     Boolean existsByEmail(String email);
     Boolean existsByUserName(String userName);
+    Page<UserModel> findAll(Pageable pageable);
 }
 

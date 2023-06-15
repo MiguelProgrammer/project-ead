@@ -5,6 +5,8 @@ import br.com.estudandoemcasa.ead.authuser.repositories.UserRepository;
 import br.com.estudandoemcasa.ead.authuser.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -59,6 +61,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean existsByUserName(String userName) {
         return userRepository.existsByUserName(userName);
+    }
+
+    @Override
+    public Page<UserModel> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
 }
