@@ -15,6 +15,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static br.com.estudandoemcasa.ead.authuser.constants.Constants.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Slf4j
 @RestController
@@ -34,10 +37,11 @@ public class UserController {
     private HttpStatus httpStatus = HttpStatus.NOT_FOUND;
     @GetMapping
     public ResponseEntity<Page<UserModel>> getAllUsers(
-            SpecificationTemplate.UserSpec userSpec,
-            @PageableDefault(sort = "userID", direction = Sort.Direction.ASC)
+            SpecificationTemplate.UserSpec userSpec, @PageableDefault(sort = "userID", direction = Sort.Direction.ASC)
                                                        Pageable pageable){
         Page<UserModel> userModels = userService.findAll(pageable, userSpec);
+        userModels.stream().filter(userModel -> !Objects.isNull(userModel))
+                .forEach(us -> us.add(linkTo(methodOn(UserController.class).getOneUser(us.getUserID())).withSelfRel()));
         return ResponseEntity.status(HttpStatus.OK).body(userModels);
     }
 
