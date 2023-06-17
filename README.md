@@ -7,7 +7,7 @@ This project called project-ead, implemented rules, the best pratics programmer 
 
 <br><img src="https://i.imgur.com/9ie6BLt.png" alt="run app" width="800" class="img-thumbnail"> 
 
-### Object Pageable hateoas
+### Object Pageable Hateoas
 ```json
 {
     "content": [
