@@ -3,6 +3,7 @@ package br.com.estudandoemcasa.ead.authuser.services;
 import br.com.estudandoemcasa.ead.authuser.models.UserModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,6 @@ public interface UserService {
     void update(UserModel userModel);
     Boolean existsByEmail(String email);
     Boolean existsByUserName(String userName);
-    Page<UserModel> findAll(Pageable pageable);
+    Page<UserModel> findAll(Pageable pageable, Specification<UserModel> userModelSpecification);
 }
 

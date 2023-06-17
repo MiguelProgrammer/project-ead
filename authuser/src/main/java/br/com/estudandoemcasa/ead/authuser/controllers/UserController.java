@@ -4,6 +4,7 @@ import br.com.estudandoemcasa.ead.authuser.dto.UserDto;
 import br.com.estudandoemcasa.ead.authuser.dto.userutils.UserView;
 import br.com.estudandoemcasa.ead.authuser.models.UserModel;
 import br.com.estudandoemcasa.ead.authuser.services.UserService;
+import br.com.estudandoemcasa.ead.authuser.specifications.SpecificationTemplate;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +33,11 @@ public class UserController {
     private UserService userService;
     private HttpStatus httpStatus = HttpStatus.NOT_FOUND;
     @GetMapping
-    public ResponseEntity<Page<UserModel>> getAllUsers(@PageableDefault(sort = "userID", direction = Sort.Direction.ASC)
+    public ResponseEntity<Page<UserModel>> getAllUsers(
+            SpecificationTemplate.UserSpec userSpec,
+            @PageableDefault(sort = "userID", direction = Sort.Direction.ASC)
                                                        Pageable pageable){
-        Page<UserModel> userModels = userService.findAll(pageable);
+        Page<UserModel> userModels = userService.findAll(pageable, userSpec);
         return ResponseEntity.status(HttpStatus.OK).body(userModels);
     }
 
